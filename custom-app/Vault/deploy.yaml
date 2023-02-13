@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx-vault
+spec:
+  selector:
+    matchLabels:
+      app: nginx-vault
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-vault
+    spec:
+      containers:
+      - name: nginx
+        image: openresty/openresty:1.19.9.1-0-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - secretRef:
+            name: my-nginx-vault
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /usr/local/openresty/nginx/conf/
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: my-nginx-cm
